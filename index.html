@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="EnvironmentReader - Premium 3D Weather Application with immersive weather experiences, real-time data, and stunning animations">
+    <meta name="keywords" content="weather, forecast, 3D weather app, real-time weather, immersive weather, climate data, weather animation">
+    <meta name="author" content="Environmental Data Solutions">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#218C8D">
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <meta property="og:title" content="EnvironmentReader - Premium 3D Weather Experience">
+    <meta property="og:description" content="Feel the weather with our immersive 3D application featuring realistic animations, real-time data, and premium user experience">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2387CEEB'/%3E%3Cstop offset='100%25' style='stop-color:%23B8E6F0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23sky)'/%3E%3Ccircle cx='75' cy='25' r='8' fill='%23FFD700'/%3E%3C/svg%3E">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EnvironmentReader - Premium Weather Experience">
+    <meta name="twitter:description" content="Immersive 3D weather application with realistic effects">
+    
+    <title>EnvironmentReader - Premium Weather Experience</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="preconnect" href="https://api.open-meteo.com">
+    <link rel="preconnect" href="https://geocoding-api.open-meteo.com">
+    <link rel="preconnect" href="https://nominatim.openstreetmap.org">
+    <link rel="preconnect" href="https://ipapi.co">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌤️%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+    <div class="background-container" id="backgroundContainer">
+        <div class="sky-layer" id="skyLayer">
+            <div class="sky-gradient" id="skyGradient"></div>
+            <div class="atmospheric-layer" id="atmosphericLayer"></div>
+        </div>
+        
+        <div class="cloud-layer" id="cloudLayer">
+            <div class="cloud-group front">
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+            </div>
+            <div class="cloud-group middle">
+                <div class="cloud cloud-3"></div>
+                <div class="cloud cloud-4"></div>
+            </div>
+            <div class="cloud-group back">
+                <div class="cloud cloud-5"></div>
+                <div class="cloud cloud-6"></div>
+            </div>
+        </div>
+        
+
+        
+        <div class="celestial-bodies" id="celestialBodies">
+            <div class="sun" id="sun">
+                <div class="sun-rays"></div>
+                <div class="sun-core"></div>
+            </div>
+            <div class="moon" id="moon">
+                <div class="moon-glow"></div>
+            </div>
+            <div class="stars" id="stars"></div>
+        </div>
+    </div>
+
+            <div class="weather-effects" id="weatherEffects">
+            <div class="precipitation-layer" id="precipitationLayer"></div>
+            <div class="wind-layer" id="windLayer"></div>
+            <div class="atmospheric-effects" id="atmosphericEffects"></div>
+            <div class="lightning-layer" id="lightningLayer"></div>
+        </div>
+
+    <div class="location-notification hidden" id="locationNotification">
+        <div class="notification-content">
+            <div class="notification-icon">🗺️</div>
+            <div class="notification-text">
+                <h4>Get Exact Weather</h4>
+                <p>Allow location access for precise weather data at your exact position</p>
+            </div>
+            <div class="notification-actions">
+                <button class="btn btn--primary btn--sm" id="allowLocation">Allow</button>
+                <button class="btn btn--secondary btn--sm" id="dismissLocation">Not now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <h1 class="app-title clickable-logo" id="logoClick">
+                        <span class="title-icon">🌤️</span>
+                        EnvironmentReader
+                    </h1>
+                    <div class="brand-tagline">Feel the Weather</div>
+                </div>
+                <div class="header-controls">
+            <div class="location-control-wrapper" id="headerLocationControl">
+                <button class="control-btn location-btn" id="locationBtn" title="Get Precise Location" aria-label="Get precise location">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </button>
+                <span class="header-location-name hidden" id="headerLocationName"></span>
+            </div>
+             <div class="search-container">
+                <input type="text" 
+                       class="search-input form-control" 
+                       id="locationSearch" 
+                       placeholder="Search any address, city, or landmark..."
+                       autocomplete="off"
+                       spellcheck="false"
+                       role="searchbox"
+                       aria-label="Search locations">
+                <button class="search-btn" id="searchBtn" title="Search" aria-label="Search">
+                    <span>🔍</span>
+                </button>
+                <div class="search-suggestions hidden" id="searchSuggestions" role="listbox">
+                    </div>
+            </div>
+            <button class="control-btn" id="tempUnitToggle" title="Toggle Temperature Unit" aria-label="Toggle Temperature Unit">°C</button>
+            <!-- <button class="control-btn sound-toggle" id="soundToggle" title="Toggle sound effects" aria-label="Toggle sound effects">
+                <span class="sound-icon">🔊</span>
+            </button> -->
+            <button class="control-btn theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+            </div>
+        </header>
+
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading-content">
+                <div class="loading-animation">
+                    <div class="weather-loading-icon">🌤️</div>
+                    <div class="loading-spinner"></div>
+                </div>
+                <h3 class="loading-title">Loading Weather Data</h3>
+                <p class="loading-message" id="loadingMessage">Detecting your location...</p>
+                <div class="loading-progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-container hidden" id="errorContainer">
+            <div class="error-content">
+                <div class="error-icon">⚠️</div>
+                <h3 class="error-title">Weather Data Unavailable</h3>
+                <p class="error-message" id="errorMessage"></p>
+                <div class="error-actions">
+                    <button class="btn btn--primary" id="retryBtn">Retry</button>
+                    <button class="btn btn--secondary" id="useDefaultBtn">Use Kolkata, India</button>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content hidden" id="mainContent" role="main">
+            <section class="current-weather card glass-card" aria-labelledby="current-weather-title">
+                <div class="card__body">
+                    <h2 id="current-weather-title" class="sr-only">Current Weather Information</h2>
+                    <div class="current-weather__header">
+                        <div class="location-info">
+                            <h2 class="location-name" id="locationName">Loading...</h2>
+                            <p class="location-details" id="locationDetails"></p>
+                            <div class="location-type" id="locationType">📍 IP Location</div>
+                        </div>
+                        <div class="time-info">
+                            <div class="current-time" id="currentTime" aria-live="polite"></div>
+                            <div class="last-updated" id="lastUpdated" aria-live="polite"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="current-weather__main">
+                        <div class="temperature-display">
+                            <span class="temperature" id="currentTemp" aria-label="Current temperature">--°</span>
+                            <span class="feels-like" id="feelsLike" aria-label="Feels like temperature">Feels like --°</span>
+                            <span class="temp-extremes-tag hidden" id="mainTempExtremesTag"></span>
+                        </div>
+                        <div class="weather-visual">
+                            <div class="weather-icon" id="weatherIcon" role="img" aria-label="Weather icon">🌤️</div>
+                            <div class="weather-condition" id="weatherCondition" aria-label="Weather condition">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="weather-metrics" role="list" aria-label="Weather details">
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">💧</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Humidity</span>
+                                <span class="metric-value" id="humidity" aria-label="Humidity level">--%</span>
+                            </div>
+                        </div>
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">💨</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Wind</span>
+                                <span class="metric-value" id="windSpeed" aria-label="Wind speed">-- km/h</span>
+                            </div>
+                        </div>
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">🌡️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Pressure</span>
+                                <span class="metric-value" id="pressure" aria-label="Air pressure">-- hPa</span>
+                            </div>
+                        </div>
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">👁️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Visibility</span>
+                                <span class="metric-value" id="visibility" aria-label="Visibility distance">-- km</span>
+                            </div>
+                        </div>
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">☀️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">UV Index</span>
+                                <span class="metric-value" id="uvIndex" aria-label="UV index level">--</span>
+                            </div>
+                        </div>
+                        <div class="metric" role="listitem">
+                            <div class="metric-icon" aria-hidden="true">☁️</div>
+                            <div class="metric-info">
+                                <span class="metric-label">Cloud Cover</span>
+                                <span class="metric-value" id="cloudCover" aria-label="Cloud coverage percentage">--%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="time-navigation card glass-card" aria-labelledby="time-nav-title">
+                <div class="card__body">
+                    <div class="time-nav-header">
+                        <h3 id="time-nav-title">Time Travel</h3>
+                        <div class="time-nav-controls" role="toolbar" aria-label="Time navigation">
+                            <button class="btn btn--secondary btn--sm" id="prevDay" title="Previous day" aria-label="Previous day">←</button>
+                            <button class="btn btn--secondary btn--sm" id="prevHour" title="Previous hour" aria-label="Previous hour">⏪</button>
+                            <button class="btn btn--primary btn--sm" id="backToToday" title="Back to Today" aria-label="Go to current time">Today</button>
+                            <button class="btn btn--secondary btn--sm" id="nextHour" title="Next hour" aria-label="Next hour">⏩</button>
+                            <button class="btn btn--secondary btn--sm" id="nextDay" title="Next day" aria-label="Next day">→</button>
+                             <button class="btn btn--secondary btn--sm" id="calendarToggleBtn" title="Select date" aria-label="Select date">📅</button>
+                        </div>
+                    </div>
+                    <div class="time-indicator">
+                        <div class="selected-time" id="selectedTimeDisplay" aria-live="polite">Current Time</div>
+                        <div class="selected-date-info" id="selectedDateInfo"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="hourly-forecast card glass-card" aria-labelledby="hourly-forecast-title">
+                <div class="card__body">
+                    <h3 class="section-title" id="hourly-forecast-title">
+                        <span class="section-icon" aria-hidden="true">⏰</span>
+                        24-Hour Forecast
+                    </h3>
+                    <div class="forecast-scroll" id="hourlyForecast" role="list" aria-label="24-hour forecast">
+                        </div>
+                </div>
+            </section>
+
+            <section class="daily-forecast card glass-card" aria-labelledby="daily-forecast-title">
+                <div class="card__body">
+                    <h3 class="section-title" id="daily-forecast-title">
+                        <span class="section-icon" aria-hidden="true">📅</span>
+                        7-Day Forecast
+                    </h3>
+                    <div class="forecast-grid" id="dailyForecast" role="list" aria-label="7-day forecast">
+                        </div>
+                </div>
+            </section>
+
+            <section class="weather-insights card glass-card" aria-labelledby="insights-title">
+                <div class="card__body">
+                    <h3 class="section-title" id="insights-title">
+                        <span class="section-icon" aria-hidden="true">🌟</span>
+                        Weather Insights
+                    </h3>
+                    <div class="insights-grid" id="weatherInsights" role="list" aria-label="Weather insights">
+                        </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>EnvironmentReader</h4>
+                    <p>Experience weather like never before with my immersive weather application EnvironmentReader.</p>
+                        <div class="footer-social">
+                            <a href="https://github.com/DMHACKERZ/EnvironmentReader" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                            </a>
+                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=debrajmistryofficial@gmail.com&su=Hello&body=I%20want%20to%20connect%20with%20you." 
+                                    target="_blank" 
+                                    title="Email" 
+                                    aria-label="Email">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 
+                                                    0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                    </a>
+                        </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h5>About</h5>
+                        <a href="#" class="footer-link" data-modal="about">About</a>
+                        <a href="#" class="footer-link" data-modal="help">Help & FAQ</a>
+                        <a href="#" class="footer-link" data-modal="contact">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h5>Legal</h5>
+                        <a href="#" class="footer-link" data-modal="privacy">Privacy Policy</a>
+                        <a href="#" class="footer-link" data-modal="terms">Terms of Service</a>
+                        <a href="#" class="footer-link" data-modal="data">Data Usage</a>
+                    </div>
+                    <div class="footer-column">
+                        <h5>Credits</h5>
+                        <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer" class="footer-link external-link">Open-Meteo API ↗</a>
+                        
+                    </div>
+                </div>
+            </div>
+               <div class="footer-bottom">
+                    <p>
+                    © 2025 EnvironmentReader. All rights reserved. For collaboration,
+                    <a href="https://dm-portfolio17.vercel.app" target="_blank" rel="noopener noreferrer">connect with me</a>!
+                    </p>
+            </div>
+        </footer>
+    </div>
+
+    <div class="modal hidden" id="searchModal" role="dialog" aria-labelledby="search-modal-title" aria-modal="true">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="search-modal-title">Search Results</h3>
+                <button class="modal-close" id="modalClose" title="Close" aria-label="Close search results">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-results" id="searchResults" role="list" aria-label="Location search results">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="aboutModal" role="dialog" aria-labelledby="about-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="about-modal-title">About EnvironmentReader</h3>
+                <button class="modal-close" title="Close" aria-label="Close about modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="about-content">
+                    <h4>Professional 3D Weather Application</h4>
+                    <p>EnvironmentReader is developed by  <a href="https://dm-portfolio17.vercel.app" target="_blank" rel="noopener noreferrer">Debraj Mistry</a>, bringing you street-level weather accuracy with immersive animations and real-time data visualization.</p>
+                    
+                    <div class="features-list">
+                        <h5>Key Features:</h5>
+                        <ul>
+                            <li>🌈 3D Weather Effects with realistic animations</li>
+                            <li>📍 Street-Level Search accuracy</li>
+                            <li>⏰ 24-Hour detailed forecasts</li>
+                            <li>📅 7-Day extended forecasts</li>
+                            <li>🎵 Real-time sound effects and animations</li>
+                            <li>🌙 Dark/Light theme support</li>
+                            <li>📱 Mobile-optimized responsive design</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-stack">
+                        <h5>Technology:</h5>
+                        <p>Built with modern web technologies including advanced CSS3 animations, ES6+ JavaScript, and the Open-Meteo weather API for professional-grade data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="privacyModal" role="dialog" aria-labelledby="privacy-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="privacy-modal-title">Privacy Policy</h3>
+                <button class="modal-close" title="Close" aria-label="Close privacy policy modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="privacy-content">
+                    <div class="privacy-section">
+                        <h4>Data Collection</h4>
+                        <p>I collect location data only with your explicit permission to provide accurate weather information for your area. This data is never stored permanently or shared with third parties.</p>
+                    </div>
+                    <div class="privacy-section">
+                        <h4>Data Usage</h4>
+                        <p>Location data is used solely for weather forecasting purposes. I fetch weather data from Open-Meteo API based on your location coordinates. No personal information is collected or stored.</p>
+                    </div>
+                    <div class="privacy-section">
+                        <h4>Local Storage</h4>
+                        <p>Only preferences like theme selection and sound settings are stored locally in your browser. This data never leaves your device and can be cleared at any time.</p>
+                    </div>
+                    <div class="privacy-section">
+                        <h4>Cookies</h4>
+                        <p>I use minimal browser storage only for app preferences. No tracking cookies or analytics are implemented to respect your privacy.</p>
+                    </div>
+                    <div class="privacy-section">
+                        <h4>Third-Party Services</h4>
+                        <p>Weather data is provided by Open-Meteo API. Please refer to their privacy policy for data handling practices.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="termsModal" role="dialog" aria-labelledby="terms-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="terms-modal-title">Terms of Service</h3>
+                <button class="modal-close" title="Close" aria-label="Close terms of service modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="terms-content">
+                    <div class="terms-section">
+                        <h4>Usage Rights</h4>
+                        <p>EnvironmentReader is free to use for personal, non-commercial purposes. You may use the application to check weather conditions and forecasts for your personal needs.</p>
+                    </div>
+                    <div class="terms-section">
+                        <h4>Data Accuracy</h4>
+                        <p>Weather data is provided as-is from reliable meteorological sources. While I strive for accuracy, weather forecasts are predictions and actual conditions may vary.</p>
+                    </div>
+                    <div class="terms-section">
+                        <h4>Liability</h4>
+                        <p>Users assume full responsibility for decisions made based on weather information provided. I am not liable for any consequences resulting from weather-related decisions.</p>
+                    </div>
+                    <div class="terms-section">
+                        <h4>Service Availability</h4>
+                        <p>The service is provided as-is with no guarantee of uptime or availability. Maintenance periods may occur without prior notice.</p>
+                    </div>
+                    <div class="terms-section">
+                        <h4>Prohibited Use</h4>
+                        <p>Users may not attempt to reverse engineer, abuse, or overload the service. Commercial use requires separate licensing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="dataModal" role="dialog" aria-labelledby="data-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="data-modal-title">Data Usage Policy</h3>
+                <button class="modal-close" title="Close" aria-label="Close data usage modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="data-content">
+                    <div class="data-section">
+                        <h4>Weather Data Sources</h4>
+                        <p>My weather data comes from Open-Meteo, a professional meteorological service that aggregates data from multiple national weather services worldwide.</p>
+                    </div>
+                    <div class="data-section">
+                        <h4>Location Detection</h4>
+                        <p>I use IP geolocation as a fallback and GPS when permitted for precise location detection. GPS data provides street-level accuracy for weather conditions.</p>
+                    </div>
+                    <div class="data-section">
+                        <h4>Data Processing</h4>
+                        <p>All weather calculations and visualizations are performed client-side in your browser. No weather data is stored on our servers.</p>
+                    </div>
+                    <div class="data-section">
+                        <h4>Update Frequency</h4>
+                        <p>Weather data is updated automatically every 10 minutes when the application is active. Manual refresh is also available.</p>
+                    </div>
+                    <div class="data-section">
+                        <h4>Offline Capability</h4>
+                        <p>Recent weather data is cached locally for offline viewing. Cache expires after 5 minutes to ensure data freshness.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="contactModal" role="dialog" aria-labelledby="contact-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="contact-modal-title">Contact & Support</h3>
+                <button class="modal-close" title="Close" aria-label="Close contact modal">×</button>
+            </div>
+          <div class="modal-body">
+                <div class="contact-content">
+                    <div class="contact-section">
+                        <h4>Get in Touch</h4>
+                        <p>I'd love to hear from you! Whether you have questions, feedback, or need technical support, I'm here to help.</p>
+                    </div>
+                     <div class="contact-content">
+                <div class="contact-section">
+                    <h4>Portfolio & Collaboration</h4>
+                    <p>For a detailed look at my work or to discuss potential collaborations, please feel free to connect with me through my portfolio.</p>
+                    <a href="https://dm-portfolio17.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn--primary">Visit Portfolio</a>
+                </div>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <strong>📧 Email:</strong>
+                            <p>debrajmistryofficial@gmail.com</p>
+                        </div>
+                        <div class="contact-item">
+                            <strong>GitHub:</strong>
+                            <p>github.com/DMHACKERZ/EnvironmentReader</p>
+                        </div>
+                    </div>
+                    <div class="support-section">
+                        <h4>Technical Support</h4>
+                        <p>For technical support, feature requests, or bug reports, please include:</p>
+                        <ul>
+                            <li>Your browser type and version</li>
+                            <li>Device type (mobile/desktop)</li>
+                            <li>Description of the issue</li>
+                            <li>Steps to reproduce the problem</li>
+                        </ul>
+                    </div>
+                    <div class="response-time">
+                        <h4>Response Time</h4>
+                        <p>I typically respond to support requests within 24-48 hours during business days.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="helpModal" role="dialog" aria-labelledby="help-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="help-modal-title">Help & FAQ</h3>
+                <button class="modal-close" title="Close" aria-label="Close help modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <div class="faq-item">
+                        <h4>❓ How do I search for a location?</h4>
+                        <p>Type any address, city, or landmark in the search box at the top. I support street-level accuracy worldwide. Simply start typing and select from the suggested results.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>📅 How do I change the date and time?</h4>
+                        <p>Click on any day in the 7-day forecast to see that day's weather. Use the time navigation controls or click on hourly forecast cards to explore different times. Click "Today" or the logo to return to current conditions.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>🌦️ What do the animations mean?</h4>
+                        <p>Background animations reflect real weather conditions - rain shows actual precipitation intensity, clouds cover the sun when cloudy, and lightning appears during thunderstorms. The sun position changes based on time of day.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>📊 How accurate is the data?</h4>
+                        <p>I use Open-Meteo API which provides professional-grade weather data updated hourly from multiple national meteorological services. Accuracy is typically very high for current conditions and decreases slightly for longer forecasts.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>📱 Does it work offline?</h4>
+                        <p>Recent weather data is cached for offline viewing for up to 5 minutes. For fresh data, an internet connection is required.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>🎵 How do I control sound effects?</h4>
+                        <p>Click the sound icon in the header to toggle weather sound effects on or off. Sounds include rain, wind, and thunder based on current conditions.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>🌙 How do I switch themes?</h4>
+                        <p>Click the theme toggle button (moon/sun icon) in the header to switch between light and dark themes. Your preference is saved automatically.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h4>📍 Why do you need location access?</h4>
+                        <p>Location access provides precise weather data for your exact position. I use IP-based location by default, but GPS provides more accurate results. Location data is never stored or shared.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="creditsModal" role="dialog" aria-labelledby="credits-modal-title" aria-modal="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="credits-modal-title">Credits & Acknowledgments</h3>
+                <button class="modal-close" title="Close" aria-label="Close credits modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="credits-content">
+                    <div class="credit-section">
+                        <h4>Weather Data</h4>
+                        <p><strong>Open-Meteo API</strong> - Professional weather data service providing accurate forecasts from national meteorological services worldwide.</p>
+                        <p>Website: <a href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">open-meteo.com</a></p>
+                    </div>
+                    <div class="credit-section">
+                        <h4>Geolocation Services</h4>
+                        <p><strong>IP-API</strong> and <strong>IPapi</strong> - IP-based geolocation services for approximate location detection.</p>
+                    </div>
+                    <div class="credit-section">
+                        <h4>Development</h4>
+                        <p><strong>Environmental Data Solutions</strong> - Application development and design</p>
+                        <p>Built with modern web technologies including HTML5, CSS3, and JavaScript ES6+.</p>
+                    </div>
+                    <div class="credit-section">
+                        <h4>Weather Icons</h4>
+                        <p>Weather visualization uses Unicode emoji icons for universal compatibility and accessibility.</p>
+                    </div>
+                    <div class="credit-section">
+                        <h4>Special Thanks</h4>
+                        <p>To the open source community and meteorological organizations worldwide for making accurate weather data accessible to developers and users.</p>
+                    </div>
+                    <div class="credit-section">
+                        <h4>License</h4>
+                        <p>EnvironmentReader is available for personal use. Commercial licensing available upon request.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-container hidden" id="calendarContainer">
+            <div class="calendar-header">
+                <button class="calendar-nav-btn" id="prevMonthBtn" aria-label="Previous month">‹</button>
+                <div class="calendar-month-year" id="monthYearDisplay" aria-live="polite"></div>
+                <button class="calendar-nav-btn" id="nextMonthBtn" aria-label="Next month">›</button>
+            </div>
+            <div class="calendar-weekdays">
+                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+
+    <div class="audio-effects hidden">
+        <div class="sound-effect" data-sound="rain" style="display: none;" aria-hidden="true"></div>
+        <div class="sound-effect" data-sound="wind" style="display: none;" aria-hidden="true"></div>
+        <div class="sound-effect" data-sound="thunder" style="display: none;" aria-hidden="true"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
